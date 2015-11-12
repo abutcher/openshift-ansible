@@ -4,7 +4,7 @@
     path: "{{ openshift_generated_configs_dir }}/{{ item.master_cert_subdir }}"
     state: directory
     mode: 0700
-  with_items: masters_needing_certs
+  with_items: "{{ masters_needing_certs }}"
 
 - file:
     src: "{{ openshift_master_config_dir }}/{{ item.1 }}"

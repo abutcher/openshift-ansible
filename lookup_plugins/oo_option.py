@@ -17,14 +17,16 @@ This returns, by order of priority:
 * if none of the above conditions are met, empty string is returned
 '''
 
-from ansible.utils import template
+from ansible.plugins.lookup import LookupBase
+from ansible import template
+
 import os
 
 # Reason: disable too-few-public-methods because the `run` method is the only
 #     one required by the Ansible API
 # Status: permanently disabled
 # pylint: disable=too-few-public-methods
-class LookupModule(object):
+class LookupModule(LookupBase):
     ''' oo_option lookup plugin main class '''
 
     # Reason: disable unused-argument because Ansible is calling us with many

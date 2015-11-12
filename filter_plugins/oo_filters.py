@@ -128,14 +128,15 @@ class FilterModule(object):
                 returns [1, 3]
         """
 
-        if not isinstance(data, dict):
-            raise errors.AnsibleFilterError("|failed expects to filter on a dict")
+        # is `__contains__` defined and callable
+        if not hasattr(getattr(data, '__contains__'), '__call__'):
+          raise errors.AnsibleFilterError("|failed input must support __contains__")
 
         if not isinstance(keys, list):
             raise errors.AnsibleFilterError("|failed expects first param is a list")
 
         # Gather up the values for the list of keys passed in
-        retval = [data[key] for key in keys if data.has_key(key)]
+        retval = [data[key] for key in keys if key in data]
 
         return retval
 

@@ -9,7 +9,7 @@ import sys
 import yaml
 
 from ansible import errors
-from ansible.runner.filter_plugins.core import bool as ansible_bool
+from ansible.plugins.filter.core import bool as ansible_bool
 
 
 class IdentityProviderBase(object):
