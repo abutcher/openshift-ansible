@@ -21,9 +21,3 @@ deployment_vars:
   enterprise: "{{ deployment_rhel7_ent_base }}"
   openshift-enterprise: "{{ deployment_rhel7_ent_base }}"
   atomic-enterprise: "{{ deployment_rhel7_ent_base }}"
-    become: false
-  enterprise:
-    image: rhel-7
-    machine_type: n1-standard-1
-    ssh_user:
-    become: true

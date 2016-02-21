@@ -1,5 +1,5 @@
 ---
-- name: restart nuagekubemon
+- name: restart nuage-openshift-monitor
   become: true
   service: name=nuage-openshift-monitor state=restarted
 

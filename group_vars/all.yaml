@@ -1,4 +1,0 @@
----
-openshift:
-  common:
-    is_containerized: false
