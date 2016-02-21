@@ -20,7 +20,7 @@ deployment_rhel7_ent_base:
                 default('25f880767ec6bf71beb532e17f1c45231640bbfdfbbb1dffb79d2c1b328388e0', True) }}"
     compression: ""
   ssh_user: openshift
-  sudo: yes
+  become: yes
 
 deployment_vars:
   origin:

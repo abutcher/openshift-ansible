@@ -31,6 +31,7 @@ deployment_vars:
   online:
     image:
     ssh_user: root
+    become: true
   enterprise: "{{ deployment_rhel7_ent_base }}"
   openshift-enterprise: "{{ deployment_rhel7_ent_base }}"
   atomic-enterprise: "{{ deployment_rhel7_ent_base }}"
