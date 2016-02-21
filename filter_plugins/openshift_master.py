@@ -9,7 +9,7 @@ import sys
 import yaml
 
 from ansible import errors
-from ansible.plugins.filter.core import bool as ansible_bool
+from ansible.constants import mk_boolean
 
 
 class IdentityProviderBase(object):
@@ -49,8 +49,8 @@ class IdentityProviderBase(object):
             raise errors.AnsibleFilterError("|failed identity provider missing a kind")
 
         self.name = self._idp.pop('name')
-        self.login = ansible_bool(self._idp.pop('login', False))
-        self.challenge = ansible_bool(self._idp.pop('challenge', False))
+        self.login = mk_boolean(self._idp.pop('login', False))
+        self.challenge = mk_boolean(self._idp.pop('challenge', False))
         self.provider = dict(apiVersion=api_version, kind=self._idp.pop('kind'))
 
         mm_keys = ('mappingMethod', 'mapping_method')
@@ -155,7 +155,7 @@ class LDAPPasswordIdentityProvider(IdentityProviderBase):
                            ['bindDN', 'bind_dn'],
                            ['bindPassword', 'bind_password']]
 
-        self._idp['insecure'] = ansible_bool(self._idp.pop('insecure', False))
+        self._idp['insecure'] = mk_boolean(self._idp.pop('insecure', False))
 
         if 'attributes' in self._idp and 'preferred_username' in self._idp['attributes']:
             pref_user = self._idp['attributes'].pop('preferred_username')
@@ -361,7 +361,7 @@ class OpenIDIdentityProvider(IdentityProviderOauthBase):
 
         if 'extraAuthorizeParameters' in self._idp:
             if 'include_granted_scopes' in self._idp['extraAuthorizeParameters']:
-                val = ansible_bool(self._idp['extraAuthorizeParameters'].pop('include_granted_scopes'))
+                val = mk_boolean(self._idp['extraAuthorizeParameters'].pop('include_granted_scopes'))
                 self._idp['extraAuthorizeParameters']['include_granted_scopes'] = val
 
 
