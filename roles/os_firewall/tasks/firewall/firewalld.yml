@@ -24,6 +24,9 @@
   command: systemctl daemon-reload
   when: install_result | changed
 
+- name: Unmask the firewalld service
+  command: systemctl unmask firewalld
+
 - name: Start and enable firewalld service
   service:
     name: firewalld
