@@ -57,5 +57,5 @@
     action: remove
     protocol: "{{ item.port.split('/')[1] }}"
     port: "{{ item.port.split('/')[0] }}"
-  with_items: os_firewall_deny
+  with_items: "{{ os_firewall_deny }}"
   when: os_firewall_deny is defined
