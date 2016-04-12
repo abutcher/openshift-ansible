@@ -1,4 +1,8 @@
 ---
+- name: Debug where we come from
+  debug:
+    msg: "I'm coming from {{ some_var_name }}"
+
 - name: Run firewalld playbook
   include: firewall/firewalld.yml
   when: "{{ os_firewall_enabled }} | bool and {{ os_firewall_use_firewalld }} | bool"
