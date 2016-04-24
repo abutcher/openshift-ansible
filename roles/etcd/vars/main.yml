@@ -1,3 +1,2 @@
 ---
-some_var_name: "role of etcd"
 os_firewall_use_firewalld: False

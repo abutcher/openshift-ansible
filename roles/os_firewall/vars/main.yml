@@ -1,3 +1,2 @@
 ---
-some_variable_name: "os_firewall"
 os_firewall_use_firewalld: True
