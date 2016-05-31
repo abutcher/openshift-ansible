@@ -11,6 +11,7 @@
   - "{{ openshift_hosted_router_certificate.certfile }}"
   - "{{ openshift_hosted_router_certificate.keyfile }}"
   delegate_to: localhost
+  become: no
   when: openshift_hosted_router_certificate is defined
 
 - name: Persist certificate contents
