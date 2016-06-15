@@ -170,7 +170,7 @@
 - name: Generate master session secrets
   hosts: oo_first_master
   vars:
-    g_session_secrets_present: "{{ (openshift.master.session_auth_secrets | default([]) and openshift.master.session_encryption_secrets | default([])) | length > 0 }}"
+    g_session_secrets_present: "{{ (openshift.master.session_auth_secrets | default([])) | length > 0 and (openshift.master.session_encryption_secrets | default([])) | length > 0 }}"
     g_session_auth_secrets: "{{ [ 24 | oo_generate_secret ] }}"
     g_session_encryption_secrets: "{{ [ 24 | oo_generate_secret ] }}"
   roles:
@@ -230,6 +230,22 @@
     copy: src="{{ item.keyfile }}" dest="{{ named_certs_dir }}" mode=0600
     with_items: openshift_master_named_certificates
     when: named_certs_specified | bool
+
+- name: Configure master certificates
+  hosts: oo_masters_to_config
+  any_errors_fatal: true
+  vars:
+    openshift_master_ha: "{{ openshift.master.ha }}"
+    openshift_master_count: "{{ openshift.master.master_count }}"
+    openshift_master_session_auth_secrets: "{{ hostvars[groups.oo_first_master.0].openshift.master.session_auth_secrets }}"
+    openshift_master_session_encryption_secrets: "{{ hostvars[groups.oo_first_master.0].openshift.master.session_encryption_secrets }}"
+  roles:
+  - role: openshift_master_certificates
+    openshift_ca_host: "{{ groups.oo_first_master.0 }}"
+    openshift_master_hostnames: "{{ hostvars
+                                    | oo_select_keys(groups['oo_masters_to_config'] | default([]))
+                                    | oo_collect('openshift.common.all_hostnames')
+                                    | oo_flatten | unique }}"
 
 - name: Configure master instances
   hosts: oo_masters_to_config
