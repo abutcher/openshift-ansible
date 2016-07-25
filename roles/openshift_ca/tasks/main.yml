@@ -47,7 +47,7 @@
       --master={{ openshift.master.api_url }}
       --public-master={{ openshift.master.public_api_url }}
       --cert-dir={{ openshift_ca_config_dir }}
-      --overwrite=false
+      --overwrite={{ openshift_certificates_redeploy | default(false) }}
   when: hostvars[openshift_ca_host].master_ca_missing | bool
   delegate_to: "{{ openshift_ca_host }}"
   run_once: true

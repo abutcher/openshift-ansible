@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Jason DeTiberus
-  description: OpenShift Master Certificates
+  description: OpenShift Etcd Server Certificates
   company: Red Hat, Inc.
   license: Apache License, Version 2.0
   min_ansible_version: 2.1
@@ -11,8 +11,6 @@ galaxy_info:
     - 7
   categories:
   - cloud
-  - system
 dependencies:
-- role: openshift_ca
-- role: openshift_etcd_client_certificates
-  when: not openshift.master.embedded_etcd | bool
+- role: openshift_etcd_facts
+- role: etcd_server_certificates

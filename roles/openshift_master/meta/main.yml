@@ -18,8 +18,6 @@ dependencies:
 - role: openshift_builddefaults
 - role: openshift_master_facts
 - role: openshift_hosted_facts
-- role: openshift_etcd_client_certificates
-  when: not openshift.master.embedded_etcd | bool
 - role: os_firewall
   os_firewall_allow:
   - service: etcd embedded
