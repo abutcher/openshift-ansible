@@ -58,7 +58,7 @@
   copy:
     src: "{{ item.src }}"
     dest: "{{ openshift_ca_config_dir }}/{{ item.dest }}"
-    force: no
+    force: "{{ true if openshift_certificates_redeploy | default(false) | bool else false }}"
   with_items:
   - src: "{{ (openshift_master_ca_certificate | default({'certfile':none})).certfile }}"
     dest: ca.crt
@@ -72,7 +72,7 @@
   copy:
     content: "1"
     dest: "{{ openshift_ca_config_dir }}/ca.serial.txt"
-    force: no
+    force: "{{ true if openshift_certificates_redeploy | default(false) | bool else false }}"
   when: openshift_master_ca_certificate is defined
   delegate_to: "{{ openshift_ca_host }}"
   run_once: true
@@ -87,7 +87,7 @@
     --master={{ openshift.master.api_url }}
     --public-master={{ openshift.master.public_api_url }}
     --cert-dir={{ openshift_ca_config_dir }}
-    --overwrite={{ openshift_certificates_redeploy | default(false) }}
+    --overwrite=false
   when: master_ca_missing | bool
   delegate_to: "{{ openshift_ca_host }}"
   run_once: true
@@ -97,6 +97,15 @@
     src: "{{ item }}.keep"
     dest: "{{ item }}"
     remote_src: true
+  with_items:
+  - "{{ openshift_ca_config_dir }}/serviceaccounts.private.key"
+  - "{{ openshift_ca_config_dir }}/serviceaccounts.public.key"
+  when: openshift_certificates_redeploy | default(false) | bool
+
+- name: Remove backup serviceaccount keys
+  file:
+    path: "{{ item }}.keep"
+    state: absent
   with_items:
   - "{{ openshift_ca_config_dir }}/serviceaccounts.private.key"
   - "{{ openshift_ca_config_dir }}/serviceaccounts.public.key"

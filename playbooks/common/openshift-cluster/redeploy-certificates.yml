@@ -69,7 +69,25 @@
       state: absent
     with_items:
     - "{{ openshift_generated_configs_dir }}"
-    - "{{ openshift.common.config_base }}/master/ca.crt"
+  - name: Remove generated certificates
+    file:
+      path: "{{ openshift.common.config_base }}/master/{{ item }}"
+      state: absent
+    with_items:
+    - "{{ hostvars[inventory_hostname] | certificates_to_synchronize(include_keys=false) }}"
+    - "ca.crt"
+    - "ca.key"
+    - "ca.serial.txt"
+    - "etcd.server.crt"
+    - "etcd.server.key"
+    - "master.etcd-client.crt"
+    - "master.etcd-client.key"
+    - "master.server.crt"
+    - "master.server.key"
+    - "ca-bundle.crt"
+    - "openshift-master.crt"
+    - "openshift-master.key"
+    - "openshift-master.kubeconfig"
   roles:
   - role: openshift_master_certificates
     openshift_master_etcd_hosts: "{{ hostvars
