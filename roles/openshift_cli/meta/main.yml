@@ -13,5 +13,6 @@ galaxy_info:
   - cloud
 dependencies:
 - role: openshift_docker
+  when: not openshift_certificates_redeploy | default(false) | bool
 - role: openshift_common
 - role: openshift_cli_facts
