@@ -131,6 +131,10 @@ kubernetesMasterConfig:
   proxyClientInfo:
     certFile: master.proxy-client.crt
     keyFile: master.proxy-client.key
+{% if 'scheduler_args' in openshift.master %}
+  schedulerArguments: {{ openshift_master_scheduler_args | default(None) | to_padded_yaml( level=3 ) }}
+{% endif %}
+  # Suspect the config below can become part of schedulerArguments vvvvv
   schedulerConfigFile: {{ openshift_master_scheduler_conf }}
   servicesNodePortRange: ""
   servicesSubnet: {{ openshift.common.portal_net }}
