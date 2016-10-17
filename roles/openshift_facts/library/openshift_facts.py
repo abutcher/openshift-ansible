@@ -903,9 +903,9 @@ def set_sdn_facts_if_unset(facts, system_facts):
 
     if 'master' in facts:
         if 'sdn_cluster_network_cidr' not in facts['master']:
-            facts['master']['sdn_cluster_network_cidr'] = '10.1.0.0/16'
+            facts['master']['sdn_cluster_network_cidr'] = '10.128.0.0/14'
         if 'sdn_host_subnet_length' not in facts['master']:
-            facts['master']['sdn_host_subnet_length'] = '8'
+            facts['master']['sdn_host_subnet_length'] = '9'
 
     if 'node' in facts and 'sdn_mtu' not in facts['node']:
         node_ip = facts['common']['ip']
@@ -1256,7 +1256,11 @@ def merge_facts(orig, new, additive_facts_to_overwrite, protected_facts_to_overw
             dict: the merged facts
     """
     additive_facts = ['named_certificates']
-    protected_facts = ['ha', 'master_count']
+    protected_facts = ['ha',
+                       'master_count',
+                       'portal_net',
+                       'sdn_cluster_network_cidr',
+                       'sdn_host_subnet_length']
 
     # Facts we do not ever want to merge. These originate in inventory variables
     # and contain JSON dicts. We don't ever want to trigger a merge
@@ -1321,6 +1325,11 @@ def merge_facts(orig, new, additive_facts_to_overwrite, protected_facts_to_overw
                         module.fail_json(msg='openshift_facts received a different value for openshift.master.ha')
                     else:
                         facts[key] = value
+                # SDN facts portal_net, sdn_cluster_network_cidr and
+                # sdn_host_subnet_length cannot change and are always
+                # set to the old value.
+                if key in ['portal_net', 'sdn_cluster_network_cidr', 'sdn_host_subnet_length']:
+                    pass
             # No other condition has been met. Overwrite the old fact
             # with the new value.
             else:
@@ -1738,11 +1747,13 @@ class OpenShiftFacts(object):
                                   deployment_subtype=deployment_subtype,
                                   hostname=hostname,
                                   public_hostname=hostname,
-                                  portal_net='172.30.0.0/16',
                                   client_binary='oc', admin_binary='oadm',
                                   dns_domain='cluster.local',
                                   install_examples=True,
                                   debug_level=2)
+
+        if 'portal_net' not in defaults['common']:
+            defaults['common']['portal_net'] = '172.30.0.0/16'
 
         if 'master' in roles:
             scheduler_predicates = [
