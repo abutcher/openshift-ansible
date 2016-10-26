@@ -1,0 +1,9 @@
+---
+- name: Restart nodes
+  hosts: oo_nodes_to_config
+  serial: 10%
+  tasks:
+  - name: restart node
+    service:
+      name: "{{ openshift.common.service_type }}-node"
+      state: restarted

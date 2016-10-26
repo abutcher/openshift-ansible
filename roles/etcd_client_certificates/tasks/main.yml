@@ -72,11 +72,40 @@
   when: etcd_client_certs_missing | bool
   delegate_to: "{{ etcd_ca_host }}"
 
+# When redeploying etcd certificates, ensure the current CA is
+# included in the new bundle.
+- block:
+  - name: Read current etcd CA
+    slurp:
+      src: "{{ etcd_cert_config_dir }}/{{ etcd_cert_prefix }}ca.crt"
+    register: g_etcd_ca_output
+
+  - name: Read OpenShift CA bundle
+    slurp:
+      src: "{{ etcd_ca_bundle }}"
+    register: g_openshift_ca_bundle_output
+    delegate_to: "{{ etcd_ca_host }}"
+
+  - copy:
+      content: "{{ (g_etcd_ca_output.content|b64decode) + (g_openshift_ca_bundle_output.content|b64decode) }}"
+      dest: "{{ etcd_generated_certs_dir}}/{{ etcd_cert_subdir }}/{{ etcd_cert_prefix }}ca.crt"
+    when: "{{ (g_etcd_ca_output.content|b64decode) not in (g_openshift_ca_bundle_output.content|b64decode) }}"
+    delegate_to: "{{ etcd_ca_host }}"
+
+  - copy:
+      src: "{{ etcd_ca_bundle }}"
+      dest: "{{ etcd_generated_certs_dir}}/{{ etcd_cert_subdir }}/{{ etcd_cert_prefix }}ca.crt"
+    when: "{{ (g_etcd_ca_output.content|b64decode) in (g_openshift_ca_bundle_output.content|b64decode) }}"
+    delegate_to: "{{ etcd_ca_host }}"
+  when: etcd_certificates_redeploy | default(false) | bool
+
+# If CA is missing and we aren't redeploying certificates just pull in
+# the bundle as is since this is likely a new cluster.
 - file:
-    src: "{{ etcd_ca_cert }}"
+    src: "{{ etcd_ca_bundle }}"
     dest: "{{ etcd_generated_certs_dir}}/{{ etcd_cert_subdir }}/{{ etcd_cert_prefix }}ca.crt"
     state: hard
-  when: etcd_client_certs_missing | bool
+  when: etcd_client_certs_missing | bool and not (etcd_certificates_redeploy | default(false) | bool)
   delegate_to: "{{ etcd_ca_host }}"
 
 - name: Create local temp directory for syncing certs

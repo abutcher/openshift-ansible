@@ -9,10 +9,11 @@ etcd_peer_cert_file: "{{ etcd_conf_dir }}/peer.crt"
 etcd_peer_key_file: "{{ etcd_conf_dir }}/peer.key"
 
 # etcd ca vars
-etcd_ca_dir: "{{ etcd_conf_dir}}/ca"
-etcd_generated_certs_dir: "{{ etcd_conf_dir }}/generated_certs"
-etcd_ca_cert: "{{ etcd_ca_dir }}/ca.crt"
-etcd_ca_key: "{{ etcd_ca_dir }}/ca.key"
+etcd_ca_dir: "{{ openshift.common.config_base }}/generated-configs/etcd-ca"
+etcd_generated_certs_dir: "{{ openshift.common.config_base }}/generated-configs/etcd"
+etcd_ca_cert: "{{ openshift.common.config_base }}/master/ca.crt"
+etcd_ca_key: "{{ openshift.common.config_base }}/master/ca.key"
+etcd_ca_bundle: "{{ openshift.common.config_base }}/master/ca-bundle.crt"
 etcd_openssl_conf: "{{ etcd_ca_dir }}/openssl.cnf"
 etcd_ca_name: etcd_ca
 etcd_req_ext: etcd_v3_req
@@ -23,7 +24,7 @@ etcd_ca_exts_client: etcd_v3_ca_client
 etcd_ca_crl_dir: "{{ etcd_ca_dir }}/crl"
 etcd_ca_new_certs_dir: "{{ etcd_ca_dir }}/certs"
 etcd_ca_db: "{{ etcd_ca_dir }}/index.txt"
-etcd_ca_serial: "{{ etcd_ca_dir }}/serial"
+etcd_ca_serial: "{{ openshift.common.config_base }}/master/ca.serial.txt"
 etcd_ca_crl_number: "{{ etcd_ca_dir }}/crlnumber"
 etcd_ca_default_days: 1825
 
