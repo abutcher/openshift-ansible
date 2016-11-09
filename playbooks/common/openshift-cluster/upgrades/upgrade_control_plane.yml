@@ -13,6 +13,16 @@
       groups: etcd_hosts_to_backup
     with_items: "{{ groups.oo_etcd_to_config if groups.oo_etcd_to_config is defined and groups.oo_etcd_to_config | length > 0 else groups.oo_first_master }}"
 
+- name: Set required master facts
+  hosts: oo_masters_to_config
+  roles:
+  - openshift_facts
+  tasks:
+  - openshift_facts:
+      role: master
+      local_facts:
+        embedded_etcd: "{{ groups.oo_etcd_to_config | length == 0 }}"
+
 - name: Backup etcd
   hosts: etcd_hosts_to_backup
   vars:
@@ -27,8 +37,9 @@
       local_facts: {}
     when: "'etcd' not in openshift"
 
-  - debug: var=openshift.etcd
-  - fail:
+  # - debug: var=openshift.etcd
+  # - debug: var=openshift.master.embedded_etcd
+  # - fail:
 
   - stat: path=/var/lib/openshift
     register: var_lib_openshift
