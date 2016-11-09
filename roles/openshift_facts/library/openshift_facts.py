@@ -709,9 +709,8 @@ def set_etcd_facts_if_unset(facts):
         etcd_facts = facts['etcd'] if 'etcd' in facts else dict()
 
         # Read ETCD_DATA_DIR from /etc/etcd/etcd.conf:
-        if os.path.isfile('/etc/etcd/etcd.conf'):
-            #try:
-            #    # Add a fake section for parsing:
+        try:
+            # Add a fake section for parsing:
             ini_str = unicode('[root]\n' + open('/etc/etcd/etcd.conf', 'r').read(), 'utf-8')
             ini_fp = io.StringIO(ini_str)
             config = ConfigParser.RawConfigParser()
@@ -719,12 +718,14 @@ def set_etcd_facts_if_unset(facts):
             etcd_data_dir = config.get('root', 'ETCD_DATA_DIR')
             if etcd_data_dir.startswith('"') and etcd_data_dir.endswith('"'):
                 etcd_data_dir = etcd_data_dir[1:-1]
+
             etcd_facts['etcd_data_dir'] = etcd_data_dir
             facts['etcd'] = etcd_facts
-            # We don't want exceptions bubbling up here:
-            # pylint: disable=broad-except
-            #except Exception:
-            #    pass
+
+        # We don't want exceptions bubbling up here:
+        # pylint: disable=broad-except
+        except Exception:
+            pass
 
     return facts
 
