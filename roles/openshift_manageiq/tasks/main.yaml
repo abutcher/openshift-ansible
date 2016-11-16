@@ -71,3 +71,4 @@
 
 - name: Clean temporary configuration file
   file: path={{manage_iq_tmp_conf}} state=absent
+  changed_when: false

@@ -4,6 +4,7 @@
   become: False
   register: copy_hosted_templates_mktemp
   run_once: True
+  changed_when: false
 
 - name: Create tar of OpenShift examples
   local_action: command tar -C "{{ role_path }}/files/{{ content_version }}/{{ hosted_deployment_type }}" -cvf "{{ copy_hosted_templates_mktemp.stdout }}/openshift-hosted-templates.tar" .
@@ -28,6 +29,7 @@
 - name: Cleanup the OpenShift hosted templates temp dir
   become: False
   local_action: file dest="{{ copy_hosted_templates_mktemp.stdout }}" state=absent
+  changed_when: false
 
 - name: Modify registry paths if registry_url is not registry.access.redhat.com
   shell: >
