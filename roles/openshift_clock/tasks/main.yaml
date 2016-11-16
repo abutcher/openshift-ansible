@@ -9,6 +9,11 @@
   action: "{{ ansible_pkg_mgr }} name=ntp state=present"
   when: openshift.clock.enabled | bool and not openshift.clock.chrony_installed | bool
 
+- name: Determine if ntpd/chronyd enabled
+  shell: timedatectl | grep enabled
+  register: timedatectl_ntp_enabled_result
+  changed_when: false
+
 - name: Start and enable ntpd/chronyd
   shell: timedatectl set-ntp true
-  when: openshift.clock.enabled | bool
+  when: openshift.clock.enabled | bool and 'yes' not in timedatectl_ntp_enabled_result.stdout
