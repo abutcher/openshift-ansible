@@ -1,3 +1,4 @@
+---
 - name: Restart masters
   hosts: oo_masters_to_config
   vars:
