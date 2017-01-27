@@ -124,37 +124,6 @@
     run_once: true
     changed_when: false
 
-- name: Distribute OpenShift CA to etcd hosts
-  hosts: oo_etcd_to_config
-  roles:
-  - etcd_common
-  post_tasks:
-  # The etcd CA may be different from the OpenShift CA initially, so
-  # we should ensure that the etcd CA is included in the newly created
-  # OpenShift CA bundle.
-  - name: Read current etcd CA
-    slurp:
-      src: "{{ etcd_conf_dir }}/ca.crt"
-    register: g_etcd_ca_output
-  - name: Read new OpenShift CA bundle
-    slurp:
-      src: "{{ hostvars['localhost'].g_master_mktemp.stdout }}/ca-bundle.crt"
-    register: g_openshift_ca_bundle_output
-    delegate_to: localhost
-    become: no
-  - name: Deploy CA certificate
-    copy:
-      content: "{{ (g_etcd_ca_output.content|b64decode) + (g_openshift_ca_bundle_output.content|b64decode) }}"
-      dest: "{{ etcd_conf_dir }}/ca.crt"
-    when: "{{ (g_etcd_ca_output.content|b64decode) not in (g_openshift_ca_bundle_output.content|b64decode) }}"
-  - name: Deploy CA certificate
-    copy:
-      src: "{{ hostvars['localhost'].g_master_mktemp.stdout }}/ca-bundle.crt"
-      dest: "{{ etcd_conf_dir }}/ca.crt"
-    when: "{{ (g_etcd_ca_output.content|b64decode) in (g_openshift_ca_bundle_output.content|b64decode) }}"
-
-- include: ../../../common/openshift-etcd/restart.yml
-
 - name: Distribute OpenShift CA to masters
   hosts: oo_masters_to_config
   vars:
@@ -206,13 +175,7 @@
       group: "{{ 'root' if item == 'root' else _ansible_ssh_user_gid.stdout  }}"
     with_items: "{{ client_users }}"
 
-- name: Restart master services
-  hosts: oo_masters_to_config
-  serial: 1
-  vars:
-    openshift_master_ha: "{{ groups.oo_masters_to_config | length > 1 }}"
-  tasks:
-  - include: ../../openshift-master/restart_services.yml
+- include: ../../../common/openshift-master/restart.yml
 
 - name: Distribute OpenShift CA certificate to nodes
   hosts: oo_nodes_to_config

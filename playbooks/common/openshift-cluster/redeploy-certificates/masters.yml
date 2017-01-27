@@ -28,7 +28,7 @@
       path: "{{ openshift.common.config_base }}/master/{{ item }}"
       state: absent
     with_items:
-    - "{{ hostvars[inventory_hostname] | certificates_to_synchronize(include_keys=false) }}"
+    - "{{ hostvars[inventory_hostname] | certificates_to_synchronize(include_keys=false, include_ca=false) }}"
     - "etcd.server.crt"
     - "etcd.server.key"
     - "master.server.crt"
@@ -42,8 +42,4 @@
                                      | oo_select_keys(groups['oo_etcd_to_config'] | default([]))
                                      | oo_collect('openshift.common.hostname')
                                      | default(none, true) }}"
-    openshift_master_hostnames: "{{ hostvars
-                                    | oo_select_keys(groups['oo_masters_to_config'] | default([]))
-                                    | oo_collect('openshift.common.all_hostnames')
-                                    | oo_flatten | unique }}"
     openshift_certificates_redeploy: true

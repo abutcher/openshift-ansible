@@ -40,12 +40,17 @@
   delegate_to: "{{ openshift_ca_host }}"
   run_once: true
 
+- debug: msg="{{ (g_master_ca_stat_result.results
+                                     | oo_collect(attribute='stat.exists')
+                                     | list) }}"
+
 - set_fact:
-    master_ca_missing: "{{ true if openshift_certificates_redeploy | default(false) | bool
-                           else False in (g_master_ca_stat_result.results
-                                         | oo_collect(attribute='stat.exists')
-                                         | list) }}"
+    master_ca_missing: "{{ False in (g_master_ca_stat_result.results
+                                     | oo_collect(attribute='stat.exists')
+                                     | list) }}"
   run_once: true
+
+- debug: var=master_ca_missing
 
 - name: Retain original serviceaccount keys
   copy:
@@ -72,21 +77,20 @@
 
 - name: Create ca serial
   copy:
-    content: "1"
+    content: "00"
     dest: "{{ openshift_ca_config_dir }}/ca.serial.txt"
-    force: "{{ true if openshift_certificates_redeploy | default(false) | bool else false }}"
+    force: "{{ openshift_certificates_redeploy | default(false) | bool }}"
   when: openshift_master_ca_certificate is defined
   delegate_to: "{{ openshift_ca_host }}"
   run_once: true
 
-# Read legacy CA's from config directory rather than openshift_ca_dir
-# to facilitate rolling update.
 - find:
     paths: "{{ openshift.common.config_base }}/master/legacy-ca/"
     patterns: ".*-ca.crt"
     use_regex: true
   register: g_master_legacy_ca_result
 
+# This should NOT replace the CA due to --overwrite=false when a CA already exists.
 - name: Create the master certificates if they do not already exist
   command: >
     {{ openshift.common.client_binary }} adm create-master-certs
@@ -101,7 +105,7 @@
     --public-master={{ openshift.master.public_api_url }}
     --cert-dir={{ openshift_ca_config_dir }}
     --overwrite=false
-  when: master_ca_missing | bool
+  when: master_ca_missing | bool or openshift_certificates_redeploy | default(false) | bool
   delegate_to: "{{ openshift_ca_host }}"
   run_once: true
 

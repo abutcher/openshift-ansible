@@ -72,6 +72,13 @@
   when: etcd_client_certs_missing | bool
   delegate_to: "{{ etcd_ca_host }}"
 
+- file:
+    src: "{{ etcd_ca_cert }}"
+    dest: "{{ etcd_generated_certs_dir}}/{{ etcd_cert_subdir }}/{{ etcd_cert_prefix }}ca.crt"
+    state: hard
+  when: etcd_server_certs_missing | bool
+  delegate_to: "{{ etcd_ca_host }}"
+
 - name: Create local temp directory for syncing certs
   local_action: command mktemp -d /tmp/etcd_certificates-XXXXXXX
   register: g_etcd_client_mktemp
