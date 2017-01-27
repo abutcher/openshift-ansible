@@ -26,6 +26,10 @@
       router_env_vars: "{{ ((l_router_dc.stdout | from_json)['spec']['template']['spec']['containers'][0]['env']
                              | oo_collect('name'))
                              | default([]) }}"
+      router_secrets: "{{ ((l_router_dc.stdout | from_json)['spec']['template']['spec']['volumes']
+                            | oo_collect('secret')
+                            | oo_collect('secretName'))
+                            | default([]) }}"
     changed_when: false
     when: l_router_dc.rc == 0
 
@@ -38,6 +42,27 @@
       --config={{ mktemp.stdout }}/admin.kubeconfig
       -n default
     when: l_router_dc.rc == 0 and 'OPENSHIFT_CA_DATA' in router_env_vars and 'OPENSHIFT_CERT_DATA' in router_env_vars and 'OPENSHIFT_KEY_DATA' in router_env_vars
+
+  - block:
+    - name: Generate router certificate
+      command: >
+        {{ openshift.common.client_binary }} adm ca create-server-cert
+        --hostnames=router.default.svc,router.default.svc.cluster.local
+        --signer-cert={{ openshift.common.config_base }}/master/service-signer.crt
+        --signer-key={{ openshift.common.config_base }}/master/service-signer.key
+        --signer-serial={{ openshift.common.config_base }}/master/ca.serial.txt
+        --cert={{ mktemp.stdout }}/tls.crt
+        --key={{ mktemp.stdout }}/tls.key
+
+    - name: Update router certificates secret
+      shell: >
+        {{ openshift.common.client_binary }} secret new router-certs
+        {{ mktemp.stdout }}/tls.crt
+        {{ mktemp.stdout }}/tls.key
+        --config={{ mktemp.stdout }}/admin.kubeconfig
+        -n default
+        -o json | oc replace -f -
+    when: l_router_dc.rc == 0 and 'router-certs' in router_secrets
 
   - name: Redeploy router
     command: >
