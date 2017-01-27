@@ -17,7 +17,6 @@
     etcd_ca_host: "{{ groups.oo_etcd_to_config.0 }}"
     etcd_conf_dir: /etc/etcd
     etcd_generated_certs_dir: "{{ etcd_conf_dir }}/generated_certs"
-
   pre_tasks:
   - stat:
       path: "{{ etcd_generated_certs_dir }}"
