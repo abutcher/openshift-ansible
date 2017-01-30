@@ -1,4 +1,6 @@
 ---
+- include: ../../common/openshift-master/validate_restart.yml
+
 - name: Restart masters
   hosts: oo_masters_to_config
   vars:

@@ -3,9 +3,6 @@
   tags:
   - always
 
-- include: ../../common/openshift-cluster/evaluate_groups.yml
-- include: ../../common/openshift-master/validate_restart.yml
-
 - include: ../../common/openshift-master/restart.yml
   vars:
     openshift_deployment_type: "{{ deployment_type }}"
