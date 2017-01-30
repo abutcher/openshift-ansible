@@ -76,7 +76,7 @@
     src: "{{ etcd_ca_cert }}"
     dest: "{{ etcd_generated_certs_dir}}/{{ etcd_cert_subdir }}/{{ etcd_cert_prefix }}ca.crt"
     state: hard
-  when: etcd_server_certs_missing | bool
+  when: etcd_client_certs_missing | bool
   delegate_to: "{{ etcd_ca_host }}"
 
 - name: Create local temp directory for syncing certs
