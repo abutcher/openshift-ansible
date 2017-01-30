@@ -205,17 +205,7 @@
   - name: update ca trust
     command: update-ca-trust
 
-- name: Restart nodes
-  hosts: oo_nodes_to_config
-  serial: 1
-  tasks:
-  # Restart docker and ensure all containerized services are running.
-  - include: docker/restart.yml
-  - name: Restart rpm node service
-    service:
-      name: "{{ openshift.common.service_type }}-node"
-      state: restarted
-    when: not openshift.common.is_containerized | bool
+- include: ../../../common/openshift-node/restart.yml
 
 - name: Delete temporary directory on CA host
   hosts: oo_first_master
