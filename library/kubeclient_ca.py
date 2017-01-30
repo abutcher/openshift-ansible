@@ -79,9 +79,9 @@ def main():
         return module.exit_json(changed=(len(changes) > 0))
 
     # ignore broad-except error to avoid stack trace to ansible user
-    # pylint: disable=broad-except, invalid-name
-    except Exception, e:
-        return module.fail_json(msg=str(e))
+    # pylint: disable=broad-except
+    except Exception as error:
+        return module.fail_json(msg=str(error))
 
 
 # pylint: disable=wrong-import-position
