@@ -6,6 +6,8 @@
 
 import base64
 import yaml
+from ansible.module_utils.basic import AnsibleModule
+
 
 DOCUMENTATION = '''
 ---
@@ -82,10 +84,6 @@ def main():
     # pylint: disable=broad-except
     except Exception as error:
         return module.fail_json(msg=str(error))
-
-
-# pylint: disable=wrong-import-position
-from ansible.module_utils.basic import AnsibleModule  # noqa: F402
 
 
 if __name__ == '__main__':
