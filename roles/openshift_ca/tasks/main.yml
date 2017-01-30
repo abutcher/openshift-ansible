@@ -40,17 +40,11 @@
   delegate_to: "{{ openshift_ca_host }}"
   run_once: true
 
-- debug: msg="{{ (g_master_ca_stat_result.results
-                                     | oo_collect(attribute='stat.exists')
-                                     | list) }}"
-
 - set_fact:
     master_ca_missing: "{{ False in (g_master_ca_stat_result.results
                                      | oo_collect(attribute='stat.exists')
                                      | list) }}"
   run_once: true
-
-- debug: var=master_ca_missing
 
 - name: Retain original serviceaccount keys
   copy:
