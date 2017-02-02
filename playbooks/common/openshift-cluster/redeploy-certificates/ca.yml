@@ -90,8 +90,10 @@
     register: g_new_etcd_ca_output
   - copy:
       content: "{{ (g_new_etcd_ca_output.content|b64decode) + (g_current_etcd_ca_output.content|b64decode) }}"
-      dest: "{{ etcd_conf_dir }}/ca.crt"
-    when: "{{ (g_new_etcd_ca_output.content|b64decode) not in (g_current_etcd_ca_output.content|b64decode) }}"
+      dest: "{{ item }}/ca.crt"
+    with_items:
+    - "{{ etcd_conf_dir }}"
+    - "{{ etcd_ca_dir }}"
 
 - name: Retrieve etcd CA certificate
   hosts: oo_first_etcd
