@@ -14,3 +14,7 @@
 - include: ../../common/openshift-master/restart.yml
 
 - include: ../../common/openshift-node/restart.yml
+
+- include: ../../common/openshift-cluster/redeploy-certificates/router.yml
+
+- include: ../../common/openshift-cluster/redeploy-certificates/registry.yml
