@@ -59,6 +59,7 @@
         {{ openshift.common.client_binary }} secret new router-certs
         {{ mktemp.stdout }}/tls.crt
         {{ mktemp.stdout }}/tls.key
+        --type=kubernetes.io/tls
         --config={{ mktemp.stdout }}/admin.kubeconfig
         -n default
         -o json | oc replace -f -
