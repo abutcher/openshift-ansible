@@ -40,6 +40,9 @@ try:
 except ImportError:
     pass
 
+import logging
+logging.basicConfig(filename='/tmp/openshift_facts.log',level=logging.DEBUG)
+
 DOCUMENTATION = '''
 ---
 module: openshift_facts
@@ -195,8 +198,9 @@ def hostname_valid(hostname):
             hostname.startswith('localhost') or
             hostname.endswith('localdomain') or
             hostname.endswith('novalocal')):
+        logging.debug("openshift_facts: hostname %s is invalid" % hostname)
         return False
-
+    logging.debug("openshift_facts: hostname %s is valid" % hostname)
     return True
 
 
@@ -1042,11 +1046,14 @@ def set_nodename(facts):
     """ set nodename """
     if 'node' in facts and 'common' in facts:
         if 'cloudprovider' in facts and facts['cloudprovider']['kind'] == 'openstack':
+            logging.debug("openshift_facts: detected openstack cloudprovider")
             facts['node']['nodename'] = facts['provider']['metadata']['hostname'].replace('.novalocal', '')
+            logging.debug("openshift_facts: setting nodename to %s facts['node']['nodename']")
         elif 'cloudprovider' in facts and facts['cloudprovider']['kind'] == 'gce':
             facts['node']['nodename'] = facts['provider']['metadata']['instance']['hostname'].split('.')[0]
         else:
             facts['node']['nodename'] = facts['common']['hostname'].lower()
+    logging.debug("openshift_facts: nodename is %s" % facts['node']['nodename'])
     return facts
 
 
@@ -1444,7 +1451,8 @@ def apply_provider_facts(facts, provider_facts):
         ip_value = provider_facts['network'].get(ip_var)
         if ip_value:
             facts['common'][ip_var] = ip_value
-
+        logging.debug("openshift_facts: choosing provider hostname from %s" % [provider_facts['network'].get(h_var)])
+        logging.debug("openshift_facts: the fallback hostname is %s" % facts['common'][h_var])
         facts['common'][h_var] = choose_hostname(
             [provider_facts['network'].get(h_var)],
             facts['common'][h_var]
@@ -2021,7 +2029,10 @@ class OpenShiftFacts(object):
         hostname_f = output.strip() if exit_code == 0 else ''
         hostname_values = [hostname_f, self.system_facts['ansible_nodename'],
                            self.system_facts['ansible_fqdn']]
+        logging.debug("openshift_facts: choosing hostname from %s" % hostname_values)
+        logging.debug("openshift_facts: fallback hostname is %s" % ip_addr)
         hostname = choose_hostname(hostname_values, ip_addr)
+        logging.debug("openshift_facts: chosen openshift.common.hostname is %s" % hostname)
 
         defaults['common'] = dict(use_openshift_sdn=True, ip=ip_addr,
                                   public_ip=ip_addr,
