@@ -30,7 +30,7 @@
   - "'certfile' in openshift_hosted_registry_routecertificates"
   - "'keyfile' in openshift_hosted_registry_routecertificates"
 
-- name: TODO: Call certificate sync handler
+- name: TODO - Call certificate sync handler
   debug:
     msg: We just created a cert for a master, need to ensure serial file is synced. Delegate to openshift_ca_host, of course
   when: not l_registry_cert_created.skipped
