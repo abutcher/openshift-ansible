@@ -79,11 +79,27 @@
   delegate_to: "{{ openshift_ca_host }}"
   run_once: true
 
+- name: Create additional ca certificate directory
+  file:
+    path: "{{ openshift.common.config_base }}/master/additional-ca"
+    state: directory
+
+- name: Deploy additional ca certificates
+  copy:
+    src: "{{ item }}"
+    dest: "{{ openshift.common.config_base }}/master/additional-ca"
+  with_items:
+  - "{{ openshift.master.additional_ca_certificates | default([]) }}"
+
 - find:
     paths: "{{ openshift.common.config_base }}/master/legacy-ca/"
     patterns: ".*-ca.crt"
     use_regex: true
   register: g_master_legacy_ca_result
+
+- find:
+    paths: "{{ openshift.common.config_base }}/master/additional-ca/"
+  register: g_master_additional_ca_result
 
 # This should NOT replace the CA due to --overwrite=false when a CA already exists.
 - name: Create the master certificates if they do not already exist
@@ -92,11 +108,8 @@
     {% for named_ca_certificate in openshift.master.named_certificates | default([]) | oo_collect('cafile') %}
     --certificate-authority {{ named_ca_certificate }}
     {% endfor %}
-    {% for ca_certificate in openshift.master.additional_ca_certificates | default([]) %}
-    --certificate-authority {{ ca_certificate }}
-    {% endfor %}
-    {% for ca_certificate in openshift.master.additional_ca_certificates | default([]) %}
-    --certificate-authority {{ ca_certificate }}
+    {% for additional_ca_certificate in g_master_additional_ca_result.files | default([]) | oo_collect('path') %}
+    --certificate-authority {{ additional_ca_certificate }}
     {% endfor %}
     {% for legacy_ca_certificate in g_master_legacy_ca_result.files | default([]) | oo_collect('path') %}
     --certificate-authority {{ legacy_ca_certificate }}
@@ -138,8 +151,8 @@
         {% for named_ca_certificate in openshift.master.named_certificates | default([]) | oo_collect('cafile') %}
         --certificate-authority {{ named_ca_certificate }}
         {% endfor %}
-        {% for ca_certificate in openshift.master.additional_ca_certificates | default([]) %}
-        --certificate-authority {{ ca_certificate }}
+        {% for additional_ca_certificate in g_master_additional_ca_result.files | default([]) | oo_collect('path') %}
+        --certificate-authority {{ additional_ca_certificate }}
         {% endfor %}
         --client-dir={{ openshift_ca_loopback_tmpdir.stdout }}
         --groups=system:masters,system:openshift-master

@@ -104,6 +104,7 @@
       controllers_env_vars: "{{ openshift_master_controllers_env_vars | default(None) }}"
       audit_config: "{{ openshift_master_audit_config | default(None) }}"
       scheduler_args: "{{ openshift_master_scheduler_args | default(None) }}"
+      additional_ca_certificates: "{{ openshift_master_additional_ca_certificates | default([]) }}"
 
 - name: Determine if scheduler config present
   stat:
