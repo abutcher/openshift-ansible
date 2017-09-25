@@ -45,7 +45,9 @@
 - name: Redeploy etcd certificates
   hosts: oo_etcd_to_config
   any_errors_fatal: true
-  tasks:
+  roles:
+  - role: openshift_etcd_facts
+  post_tasks:
     - include_role:
         name: etcd
         tasks_from: server_certificates
