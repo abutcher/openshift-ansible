@@ -2,29 +2,29 @@
 ######################################################################)
 # Users, projects, and privileges
 
-- name: Run pre-install CFME validation checks
+- name: Run pre-install Management validation checks
   include: validate.yml
 
 # This creates a service account allowing Container Provider
-# integration (managing OCP/Origin via MIQ/CFME)
+# integration (managing OCP/Origin via MIQ/Management)
 - name: Enable Container Provider Integration
   include_role:
     role: openshift_manageiq
 
-- name: "Ensure the CFME '{{ openshift_management_project }}' namespace exists"
+- name: "Ensure the Management '{{ openshift_management_project }}' namespace exists"
   oc_project:
     state: present
     name: "{{ openshift_management_project }}"
     display_name: "{{ openshift_management_project_description }}"
 
-- name: Create and Authorize CFME Accounts
+- name: Create and Authorize Management Accounts
   include: accounts.yml
 
 ######################################################################
 # STORAGE - Initialize basic storage class
 #---------------------------------------------------------------------
 # * nfs - set up NFS shares on the first master for a proof of concept
-- name: Create required NFS exports for CFME app storage
+- name: Create required NFS exports for Management app storage
   include: storage/nfs.yml
   when: openshift_management_storage_class == 'nfs'
 
@@ -51,7 +51,7 @@
 
 ######################################################################
 # APPLICATION TEMPLATE
-- name: Install the CFME app and PV templates
+- name: Install the Management app and PV templates
   include: template.yml
 
 ######################################################################
