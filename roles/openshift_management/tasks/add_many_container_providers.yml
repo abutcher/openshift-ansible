@@ -27,7 +27,7 @@
     register: results
 
   # TODO: Make this prettier and easier to read
-  - name: Print each provider result
+  - name: Save results
     copy:
       dest: /tmp/results.json
       content: "{{ results.results | to_nice_json }}"
@@ -35,3 +35,7 @@
     # debug:
     #   var: item.item
     # with_items: "{{ results.results }}"
+
+  - name: print each result
+    debug:
+      msg: "{{ results.results | oo_filter_container_providers }}"
