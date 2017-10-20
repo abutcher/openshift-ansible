@@ -28,6 +28,10 @@
 
   # TODO: Make this prettier and easier to read
   - name: Print each provider result
-    debug:
-      var: item.item
-    with_items: "{{ results.results }}"
+    copy:
+      dest: /tmp/results.json
+      content: "{{ results.results | to_nice_json }}"
+      # state: present
+    # debug:
+    #   var: item.item
+    # with_items: "{{ results.results }}"

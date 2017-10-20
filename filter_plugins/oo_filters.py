@@ -1192,6 +1192,20 @@ that result to this filter plugin.
     return secret_name
 
 
+def filter_container_providers(results):
+    """results - the result from posting the API calls for adding new
+providers"""
+    for result in results:
+        if 'results' in results:
+            # We got an OK response
+            # print json.dumps(results['results'])
+            print "OK"
+        elif 'error' in results:
+            # This was a problem
+            print "ERROR"
+    return None
+
+
 class FilterModule(object):
     """ Custom ansible filter mapping """
 
