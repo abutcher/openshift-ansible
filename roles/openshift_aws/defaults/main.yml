@@ -124,6 +124,12 @@ openshift_aws_ami_map:
   infra: "{{ openshift_aws_ami }}"
   compute: "{{ openshift_aws_ami }}"
 
+openshift_aws_master_group_tags:
+  host-type: master
+  sub-host-type: default
+  runtime: docker
+  version: "{{ openshift_aws_new_version }}"
+
 openshift_aws_master_group_config:
   # The 'master' key is always required here.
   master:
@@ -135,11 +141,9 @@ openshift_aws_master_group_config:
     min_size: 3
     max_size: 3
     desired_size: 3
-    tags:
-      host-type: master
-      sub-host-type: default
-      runtime: docker
-      version: "{{ openshift_aws_new_version }}"
+    tags: "{{ openshift_aws_master_group_tags }}"
+    labels:
+      type: master
     wait_for_instances: True
     termination_policy: "{{ openshift_aws_node_group_termination_policy }}"
     replace_all_instances: "{{ openshift_aws_node_group_replace_all_instances }}"
@@ -147,6 +151,18 @@ openshift_aws_master_group_config:
     policy_name: "{{ openshift_aws_iam_role_policy_name }}"
     policy_json: "{{ openshift_aws_iam_role_policy_json }}"
     elbs: "{{ openshift_aws_elb_name_dict['master'].keys()| map('extract', openshift_aws_elb_name_dict['master']) | list }}"
+
+openshift_aws_node_group_compute_tags:
+  host-type: node
+  sub-host-type: compute
+  runtime: docker
+  version: "{{ openshift_aws_new_version }}"
+
+openshift_aws_node_group_infra_tags:
+  host-type: node
+  sub-host-type: infra
+  runtime: docker
+  version: "{{ openshift_aws_new_version }}"
 
 openshift_aws_node_group_config:
   # The 'compute' key is always required here.
@@ -159,11 +175,9 @@ openshift_aws_node_group_config:
     min_size: 3
     max_size: 100
     desired_size: 3
-    tags:
-      host-type: node
-      sub-host-type: compute
-      runtime: docker
-      version: "{{ openshift_aws_new_version }}"
+    tags: "{{ openshift_aws_node_group_compute_tags }}"
+    labels:
+      type: compute
     termination_policy: "{{ openshift_aws_node_group_termination_policy }}"
     replace_all_instances: "{{ openshift_aws_node_group_replace_all_instances }}"
     iam_role: "{{ openshift_aws_iam_role_name }}"
@@ -179,11 +193,9 @@ openshift_aws_node_group_config:
     min_size: 2
     max_size: 20
     desired_size: 2
-    tags:
-      host-type: node
-      sub-host-type: infra
-      runtime: docker
-      version: "{{ openshift_aws_new_version }}"
+    tags: "{{ openshift_aws_node_group_infra_tags }}"
+    labels:
+      type: infra
     termination_policy: "{{ openshift_aws_node_group_termination_policy }}"
     replace_all_instances: "{{ openshift_aws_node_group_replace_all_instances }}"
     iam_role: "{{ openshift_aws_iam_role_name }}"
