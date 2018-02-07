@@ -6,13 +6,16 @@
     state: list
   register: configout
   run_once: true
+  delegate_to: "{{ openshift_node_group_master_host }}"
 
 - name: debug node config
   debug: var=configout
   run_once: true
+  delegate_to: "{{ openshift_node_group_master_host }}"
 
 - when:
   - configout.results.results.0 == {} or (configout.results.results.0 != {} and openshift_node_group_edits|length > 0)
+  delegate_to: "{{ openshift_node_group_master_host }}"
   block:
   - name: create a temp dir for this work
     command: mktemp -d /tmp/openshift_node_config-XXXXXX

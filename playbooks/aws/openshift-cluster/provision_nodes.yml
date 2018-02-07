@@ -3,7 +3,7 @@
   hosts: localhost
   connection: local
   gather_facts: yes
-  tasks:
+  pre_tasks:
   - name: Alert user to variables needed - clusterid
     debug:
       msg: "openshift_aws_clusterid={{ openshift_aws_clusterid | default('default') }}"
@@ -11,7 +11,13 @@
   - name: Alert user to variables needed - region
     debug:
       msg: "openshift_aws_region={{ openshift_aws_region | default('us-east-1') }}"
-
+  - import_role:
+      name: openshift_aws
+      tasks_from: setup_master_group.yml
+  roles:
+  - role: openshift_node_group
+    openshift_node_group_master_host: "{{ groups.masters.0 }}"
+  post_tasks:
   - name: create the node groups
     import_role:
       name: openshift_aws
