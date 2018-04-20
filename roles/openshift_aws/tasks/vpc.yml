@@ -1,6 +1,6 @@
 ---
 - name: Create AWS VPC
-  ec2_vpc_net:
+  ec2_vpc_net26:
     state: present
     cidr_block: "{{ openshift_aws_vpc.cidr }}"
     dns_support: True
